@@ -24,6 +24,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
@@ -53,13 +54,10 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         // array disponible
-                        try {
-                            JSONArray jsonArray = response.getJSONArray("mensaje");
-                            ArrayList<Villano> listaVillanos = Datos.getListaVillanos();
 
-                            for (int i = 0; i < jsonArray.length (); ++i) {
-                                listaVillanos.add(new Villano(jsonArray.getString(0), jsonArray.getString(1), jsonArray.getString(2)));
-                            }
+                        try {
+                            JSONArray array = response.getJSONArray("mensaje");
+                            getListaDatos(array);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -88,25 +86,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void mostrarListView( ){
 
-        //getListaDatos(jsonObject);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rvListaVillanos.setLayoutManager(llm);
         recyclerViewAdapter = new RecyclerViewAdapter(Datos.getListaVillanos());
         rvListaVillanos.setAdapter(recyclerViewAdapter);
     }
 
-    public void getListaDatos(JSONObject jsonObject){
+    public void getListaDatos(JSONArray jsonArray) throws JSONException {
+
         ArrayList<Villano> listaVillanos = Datos.getListaVillanos();
-        JSONArray keys = jsonObject.names ();
 
-        try{
-            for (int i = 0; i < keys.length (); ++i) {
-                listaVillanos.add(new Villano(jsonObject.getString("nombre"), jsonObject.getString("pelicula"), jsonObject.getString("poderes")));
-            }
-        }catch (Exception e){
-            e.printStackTrace();
+        for(int i = 0 ; i < jsonArray.length() ; i++){
+            JSONObject villano = jsonArray.getJSONObject(i);
+            String nombre = villano.getString("nombre");
+            String pelicula = villano.getString("pelicula");
+            String poderes = villano.getString("poderes");
+            listaVillanos.add(new Villano(nombre, pelicula, poderes));
         }
-
 
     }
 }
