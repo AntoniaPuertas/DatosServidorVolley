@@ -33,15 +33,20 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView rvListaVillanos;
     RecyclerViewAdapter recyclerViewAdapter;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         rvListaVillanos = findViewById(R.id.rvListaVillanos);
-
         colaDePeticiones = Volley.newRequestQueue(this);
 
-        getDatos();
+        if(Datos.getListaVillanos().size() == 0){
+            getDatos();
+        }else{
+            mostrarListView();
+        }
+
     }
 
     void getDatos() {
