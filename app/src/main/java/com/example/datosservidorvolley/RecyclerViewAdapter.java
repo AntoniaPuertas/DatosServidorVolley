@@ -1,21 +1,39 @@
 package com.example.datosservidorvolley;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
+
 import java.util.ArrayList;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolderVillanos> {
 
     private ArrayList<Villano> listaVillanos;
+    private Context context;
 
+    private RequestQueue colaDePeticiones;
+    private Volleys volleys;
 
-    public RecyclerViewAdapter(ArrayList<Villano> listaVillanos) {
+    private static final String URL_BASE = "https://apcpruebas.es/datosServidor/";
+
+    public RecyclerViewAdapter(ArrayList<Villano> listaVillanos, Context context) {
         this.listaVillanos = listaVillanos;
+        this.context = context;
+
+        //obtenemos una referencia a la cola de peticiones
+        volleys = Volleys.getInstance(context);
+        colaDePeticiones = volleys.getRequestQueue();
     }
 
 
@@ -29,7 +47,27 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public void onBindViewHolder(final ViewHolderVillanos holder, final int position) {
 
-        holder.imgVillano.setImageResource(R.drawable.ic_mood_bad_black_24dp);
+
+        // Petición para obtener la imagen
+        ImageRequest request = new ImageRequest(
+                URL_BASE + listaVillanos.get(position).getImagen(),
+                new Response.Listener<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap bitmap) {
+                        holder.imgVillano.setImageBitmap(bitmap);
+                    }
+                }, 0, 0, null,null,
+                new Response.ErrorListener() {
+                    public void onErrorResponse(VolleyError error) {
+                        holder.imgVillano.setImageResource(R.drawable.ic_mood_bad_black_24dp);
+                        Log.d("Adapter", "Error en respuesta Bitmap: "+ error.getMessage());
+                    }
+                });
+
+        // Añadir petición a la cola
+        colaDePeticiones.add(request);
+
+        //holder.imgVillano.setImageResource(R.drawable.ic_mood_bad_black_24dp);
         holder.txtNombreVillano.setText(listaVillanos.get(position).getNombre());
         holder.txtPelicula.setText(listaVillanos.get(position).getPelicula());
         holder.txtPoderes.setText(listaVillanos.get(position).getPoderes());

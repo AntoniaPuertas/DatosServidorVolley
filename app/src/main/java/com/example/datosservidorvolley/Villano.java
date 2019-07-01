@@ -7,12 +7,14 @@ public class Villano implements Serializable {
     private String nombre;
     private String pelicula;
     private String poderes;
+    private String imagen;
 
 
-    public Villano(String nombre, String pelicula, String poderes) {
+    public Villano(String nombre, String pelicula, String poderes, String imagen) {
         this.nombre = nombre;
         this.pelicula = pelicula;
         this.poderes = poderes;
+        this.imagen = imagen;
     }
 
 
@@ -38,6 +40,14 @@ public class Villano implements Serializable {
 
     public void setPoderes(String poderes) {
         this.poderes = poderes;
+    }
+
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
     }
 
     @Override

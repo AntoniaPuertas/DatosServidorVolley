@@ -11,10 +11,11 @@
 
     <ImageView
         android:id="@+id/imgVillano"
-        android:layout_width="@android:dimen/notification_large_icon_width"
-        android:layout_height="@android:dimen/notification_large_icon_height"
+        android:layout_width="@dimen/imageWidth"
+        android:layout_height="@dimen/imageHeight"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:background="#90D573"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@tools:sample/avatars" />

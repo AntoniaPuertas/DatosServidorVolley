@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="margen_item">16dp</dimen>
+    <dimen name="imageWidth">128dp</dimen>
+    <dimen name="imageHeight">128dp</dimen>
 </resources>

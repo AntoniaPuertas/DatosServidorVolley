@@ -1,21 +1,17 @@
 package com.example.datosservidorvolley;
 
-import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,13 +19,12 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     RequestQueue colaDePeticiones;
+    Volleys volleys;
     RecyclerView rvListaVillanos;
     RecyclerViewAdapter recyclerViewAdapter;
 
@@ -39,7 +34,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         rvListaVillanos = findViewById(R.id.rvListaVillanos);
-        colaDePeticiones = Volley.newRequestQueue(this);
+
+
+        //colaDePeticiones = Volley.newRequestQueue(this);
+
+        //obtenemos una referencia a la cola de peticiones
+        volleys = Volleys.getInstance(this);
+        colaDePeticiones = volleys.getRequestQueue();
 
         if(Datos.getListaVillanos().size() == 0){
             getDatos();
@@ -93,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rvListaVillanos.setLayoutManager(llm);
-        recyclerViewAdapter = new RecyclerViewAdapter(Datos.getListaVillanos());
+        recyclerViewAdapter = new RecyclerViewAdapter(Datos.getListaVillanos(), this);
         rvListaVillanos.setAdapter(recyclerViewAdapter);
     }
 
@@ -106,7 +107,8 @@ public class MainActivity extends AppCompatActivity {
             String nombre = villano.getString("nombre");
             String pelicula = villano.getString("pelicula");
             String poderes = villano.getString("poderes");
-            listaVillanos.add(new Villano(nombre, pelicula, poderes));
+            String imagen = villano.getString("imagen");
+            listaVillanos.add(new Villano(nombre, pelicula, poderes, imagen));
         }
 
     }
