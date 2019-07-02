@@ -1,7 +1,9 @@
 package com.example.datosservidorvolley;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +17,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolderVillanos> {
@@ -71,6 +74,22 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.txtNombreVillano.setText(listaVillanos.get(position).getNombre());
         holder.txtPelicula.setText(listaVillanos.get(position).getPelicula());
         holder.txtPoderes.setText(listaVillanos.get(position).getPoderes());
+
+        holder.imgVillano.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, ItemActivity.class);
+                intent.putExtra("id_villano", position);
+                ImageView imageView = (ImageView)v;
+                Bitmap bitmap = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
+                ByteArrayOutputStream btStream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, btStream);
+                byte[] byteArray = btStream.toByteArray();
+
+                intent.putExtra("imagen", byteArray);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override
