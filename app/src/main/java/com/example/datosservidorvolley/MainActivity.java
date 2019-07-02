@@ -42,11 +42,11 @@ public class MainActivity extends AppCompatActivity {
         volleys = Volleys.getInstance(this);
         colaDePeticiones = volleys.getRequestQueue();
 
-        if(Datos.getListaVillanos().size() == 0){
+
             getDatos();
-        }else{
+
             mostrarListView();
-        }
+
 
     }
 
@@ -62,12 +62,19 @@ public class MainActivity extends AppCompatActivity {
                         // array disponible
 
                         try {
-                            JSONArray array = response.getJSONArray("mensaje");
-                            getListaDatos(array);
+                            int resultado = response.getInt("estado");
+
+                            if(resultado == 0){
+                                JSONArray array = response.getJSONArray("mensaje");
+                                getListaDatos(array);
+                                //mostrarListView();
+                                recyclerViewAdapter.notifyDataSetChanged();
+                            }
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        mostrarListView();
+
                     }
                 },new Response.ErrorListener() {
 
@@ -101,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
     public void getListaDatos(JSONArray jsonArray) throws JSONException {
 
         ArrayList<Villano> listaVillanos = Datos.getListaVillanos();
+        listaVillanos.clear();
 
         for(int i = 0 ; i < jsonArray.length() ; i++){
             JSONObject villano = jsonArray.getJSONObject(i);
