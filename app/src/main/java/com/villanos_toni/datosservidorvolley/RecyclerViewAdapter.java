@@ -1,4 +1,4 @@
-package com.example.datosservidorvolley;
+package com.villanos_toni.datosservidorvolley;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,13 +12,22 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolderVillanos> {
 
@@ -31,12 +40,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private static final String URL_BASE = "https://apcpruebas.es/datosServidor/";
 
     public RecyclerViewAdapter(ArrayList<Villano> listaVillanos, Context context) {
-        this.listaVillanos = listaVillanos;
         this.context = context;
 
         //obtenemos una referencia a la cola de peticiones
         volleys = Volleys.getInstance(context);
+        this.listaVillanos = listaVillanos;
         colaDePeticiones = volleys.getRequestQueue();
+        getDatos();
+
     }
 
 
@@ -94,10 +105,73 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public int getItemCount() {
-        return listaVillanos.size();
+        int num = 0;
+        if(listaVillanos != null){
+            num = listaVillanos.size();
+        }
+        return num;
     }
 
+    void getDatos() {
+        JsonObjectRequest peticion = new JsonObjectRequest(
+                Request.Method.GET,
+                "https://apcpruebas.es/datosServidor",
 
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // array disponible
+
+                        try {
+                            JSONArray array = response.getJSONArray("mensaje");
+                            listaVillanos = getListaDatos(array);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        //mostrarListView();
+                        notifyDataSetChanged();
+                    }
+                },new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                Log.i("datos", error.toString());
+            }
+
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Auto", "2F4A58256CF53C5AF94D8BA7A9D08DB0");
+                return headers;
+            }
+        };
+
+        colaDePeticiones.add(peticion);
+    }
+
+    public ArrayList<Villano> getListaDatos(JSONArray jsonArray) throws JSONException {
+
+        //ArrayList<Villano> listaVillanos = new ArrayList<>();
+        ArrayList<Villano> mlistaVillanos = Datos.getListaVillanos();
+        if(jsonArray.length() > 0){
+            mlistaVillanos.clear();
+        }
+
+        for(int i = 0 ; i < jsonArray.length() ; i++){
+            JSONObject villano = jsonArray.getJSONObject(i);
+            String nombre = villano.getString("nombre");
+            String pelicula = villano.getString("pelicula");
+            String poderes = villano.getString("poderes");
+            String imagen = villano.getString("imagen");
+            mlistaVillanos.add(new Villano(nombre, pelicula, poderes, imagen));
+        }
+
+        return mlistaVillanos;
+    }
 
     static class ViewHolderVillanos extends RecyclerView.ViewHolder {
 
