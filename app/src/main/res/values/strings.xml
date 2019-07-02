@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">DatosServidorVolley</string>
+    <string name="app_name">VillanosV</string>
+    <string name="nuevoVillano">Nuevo Villano</string>
+    <string name="nombre">Nombre</string>
+    <string name="pelicula">Película</string>
+    <string name="poderes">Poderes</string>
+    <string name="imagen">Imagen</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="guardar">Guardar</string>
 </resources>

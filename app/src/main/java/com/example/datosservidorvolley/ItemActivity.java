@@ -1,11 +1,14 @@
 package com.example.datosservidorvolley;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,6 +18,7 @@ public class ItemActivity extends AppCompatActivity {
     TextView txtItemNombre;
     TextView txtItemPelicula;
     TextView txtItemPoderes;
+    FloatingActionButton fbEditar;
 
     Bitmap bitmap;
     Villano villano;
@@ -33,11 +37,14 @@ public class ItemActivity extends AppCompatActivity {
         txtItemNombre = findViewById(R.id.txtItemNombre);
         txtItemPelicula = findViewById(R.id.txtItemPelicula);
         txtItemPoderes = findViewById(R.id.txtItemPoderes);
+        fbEditar = findViewById(R.id.fbEditar);
 
-        int posicion = getIntent().getExtras().getInt("id_villano");
+        final int posicion = getIntent().getExtras().getInt("id_villano");
         villano = Datos.getListaVillanos().get(posicion);
 
-        byte[] byteArray = getIntent().getByteArrayExtra("imagen");
+
+
+        final byte[] byteArray = getIntent().getByteArrayExtra("imagen");
         bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
 
         imgItemVillano.setImageBitmap(bitmap);
@@ -48,6 +55,16 @@ public class ItemActivity extends AppCompatActivity {
         //para el zoom
         scaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
         scala = 1.0f;
+
+        fbEditar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ItemActivity.this, EditarActivity.class);
+                intent.putExtra("imagen", byteArray);
+                intent.putExtra("id_villano", posicion);
+                intent.putExtra("accion", "modificar");
+            }
+        });
 
     }
 

@@ -1,10 +1,13 @@
 package com.example.datosservidorvolley;
 
+import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -27,13 +30,14 @@ public class MainActivity extends AppCompatActivity {
     Volleys volleys;
     RecyclerView rvListaVillanos;
     RecyclerViewAdapter recyclerViewAdapter;
-
+    FloatingActionButton floatingActionButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         rvListaVillanos = findViewById(R.id.rvListaVillanos);
+        floatingActionButton = findViewById(R.id.floatingActionButton);
 
 
         //colaDePeticiones = Volley.newRequestQueue(this);
@@ -42,6 +46,15 @@ public class MainActivity extends AppCompatActivity {
         volleys = Volleys.getInstance(this);
         colaDePeticiones = volleys.getRequestQueue();
 
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //crear nuevo villano
+                Intent intent = new Intent(MainActivity.this, ItemActivity.class);
+                intent.putExtra("accion", "nuevo");
+                startActivity(intent);
+            }
+        });
 
             getDatos();
 
