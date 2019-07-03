@@ -4,19 +4,28 @@ import java.io.Serializable;
 
 public class Villano implements Serializable {
 
+    private int id;
     private String nombre;
     private String pelicula;
     private String poderes;
     private String imagen;
 
 
-    public Villano(String nombre, String pelicula, String poderes, String imagen) {
+    public Villano(int id, String nombre, String pelicula, String poderes, String imagen) {
+        this.id = id;
         this.nombre = nombre;
         this.pelicula = pelicula;
         this.poderes = poderes;
         this.imagen = imagen;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getNombre() {
         return nombre;
@@ -53,9 +62,11 @@ public class Villano implements Serializable {
     @Override
     public String toString() {
         return "Villano{" +
-                "nombre='" + nombre + '\'' +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
                 ", pelicula='" + pelicula + '\'' +
                 ", poderes='" + poderes + '\'' +
+                ", imagen='" + imagen + '\'' +
                 '}';
     }
 }

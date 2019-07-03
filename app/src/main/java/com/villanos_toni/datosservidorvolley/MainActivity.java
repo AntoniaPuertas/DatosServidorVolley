@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //crear nuevo villano
-                Intent intent = new Intent(MainActivity.this, ItemActivity.class);
+                Intent intent = new Intent(MainActivity.this, EditarActivity.class);
                 intent.putExtra("accion", "nuevo");
                 startActivity(intent);
             }
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     void getDatos() {
         JsonObjectRequest peticion = new JsonObjectRequest(
                 Request.Method.GET,
-                "https://apcpruebas.es/datosServidor",
+                "https://apcpruebas.es/toni/villanos/controladores/controlVillanos.php",
 
                 null,
                 new Response.Listener<JSONObject>() {
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Auto", "2F4A58256CF53C5AF94D8BA7A9D08DB0");
+                headers.put("Auto", "21232F297A57A5A743894A0E4A801FC3");
                 return headers;
             }
         };
@@ -125,12 +125,19 @@ public class MainActivity extends AppCompatActivity {
 
         for(int i = 0 ; i < jsonArray.length() ; i++){
             JSONObject villano = jsonArray.getJSONObject(i);
+            int id = villano.getInt("id");
             String nombre = villano.getString("nombre");
             String pelicula = villano.getString("pelicula");
             String poderes = villano.getString("poderes");
             String imagen = villano.getString("imagen");
-            listaVillanos.add(new Villano(nombre, pelicula, poderes, imagen));
+            listaVillanos.add(new Villano(id, nombre, pelicula, poderes, imagen));
         }
 
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        recyclerViewAdapter.notifyDataSetChanged();
     }
 }

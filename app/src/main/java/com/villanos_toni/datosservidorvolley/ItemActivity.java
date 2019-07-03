@@ -63,6 +63,8 @@ public class ItemActivity extends AppCompatActivity {
                 intent.putExtra("imagen", byteArray);
                 intent.putExtra("id_villano", posicion);
                 intent.putExtra("accion", "modificar");
+                startActivity(intent);
+                finish();
             }
         });
 

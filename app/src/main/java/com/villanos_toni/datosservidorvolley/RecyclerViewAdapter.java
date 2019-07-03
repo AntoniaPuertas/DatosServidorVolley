@@ -1,6 +1,8 @@
 package com.villanos_toni.datosservidorvolley;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -37,7 +40,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private RequestQueue colaDePeticiones;
     private Volleys volleys;
 
-    private static final String URL_BASE = "https://apcpruebas.es/datosServidor/";
+    private static final String URL_BASE = "https://apcpruebas.es/toni/villanos/images/";
 
     public RecyclerViewAdapter(ArrayList<Villano> listaVillanos, Context context) {
         this.context = context;
@@ -46,7 +49,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         volleys = Volleys.getInstance(context);
         this.listaVillanos = listaVillanos;
         colaDePeticiones = volleys.getRequestQueue();
-        getDatos();
 
     }
 
@@ -73,7 +75,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }, 0, 0, null,null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
-                        holder.imgVillano.setImageResource(R.drawable.ic_mood_bad_black_24dp);
+                        holder.imgVillano.setImageResource(R.drawable.villano);
                         Log.d("Adapter", "Error en respuesta Bitmap: "+ error.getMessage());
                     }
                 });
@@ -101,36 +103,59 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 context.startActivity(intent);
             }
         });
+
+        holder.imgEliminar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createSimpleDialog(position).show();
+
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        int num = 0;
-        if(listaVillanos != null){
-            num = listaVillanos.size();
-        }
-        return num;
+
+            return listaVillanos.size();
+
     }
 
-    void getDatos() {
-        JsonObjectRequest peticion = new JsonObjectRequest(
-                Request.Method.GET,
-                "https://apcpruebas.es/datosServidor",
 
-                null,
+    private void eliminarVillano(final int position){
+
+        Map<String, String> parametros = new HashMap<String, String>();
+        parametros.put("id", String.valueOf(listaVillanos.get(position).getId()));
+
+        Map<String, Map> cuerpo = new HashMap<String, Map>();
+        cuerpo.put("eliminarVillano", parametros);
+        JSONObject jsonObject = new JSONObject(cuerpo);
+
+
+        JsonObjectRequest peticion = new JsonObjectRequest(
+                Request.Method.POST,
+                "https://apcpruebas.es/toni/villanos/controladores/controlVillanos.php",
+
+                jsonObject,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         // array disponible
 
                         try {
-                            JSONArray array = response.getJSONArray("mensaje");
-                            listaVillanos = getListaDatos(array);
+                            int resultado = response.getInt("estado");
+                            String mensaje = response.getString("mensaje");
+                            if(resultado == 0){
+                                //eliminar el villano de la lista
+                                listaVillanos.remove(position);
+                                notifyDataSetChanged();
+                                }
+
+                            Toast.makeText(context, mensaje, Toast.LENGTH_LONG).show();
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        //mostrarListView();
-                        notifyDataSetChanged();
+
                     }
                 },new Response.ErrorListener() {
 
@@ -138,6 +163,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
                 Log.i("datos", error.toString());
+                Toast.makeText(context, error.toString(), Toast.LENGTH_LONG).show();
             }
 
         })
@@ -145,7 +171,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Auto", "2F4A58256CF53C5AF94D8BA7A9D08DB0");
+                headers.put("Auto", "21232F297A57A5A743894A0E4A801FC3");
                 return headers;
             }
         };
@@ -153,30 +179,32 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         colaDePeticiones.add(peticion);
     }
 
-    public ArrayList<Villano> getListaDatos(JSONArray jsonArray) throws JSONException {
-
-        //ArrayList<Villano> listaVillanos = new ArrayList<>();
-        ArrayList<Villano> mlistaVillanos = Datos.getListaVillanos();
-        if(jsonArray.length() > 0){
-            mlistaVillanos.clear();
-        }
-
-        for(int i = 0 ; i < jsonArray.length() ; i++){
-            JSONObject villano = jsonArray.getJSONObject(i);
-            String nombre = villano.getString("nombre");
-            String pelicula = villano.getString("pelicula");
-            String poderes = villano.getString("poderes");
-            String imagen = villano.getString("imagen");
-            mlistaVillanos.add(new Villano(nombre, pelicula, poderes, imagen));
-        }
-
-        return mlistaVillanos;
+    public AlertDialog createSimpleDialog(final int position){
+        String mensaje = "¿Seguro que quieres eliminar a " + listaVillanos.get(position).getNombre() + " ?";
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Atención")
+                .setMessage(mensaje)
+                .setPositiveButton("Borrar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //eliminar nota
+                        eliminarVillano(position);
+                    }
+                })
+                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //cancelar operación
+                    }
+                });
+        return builder.create();
     }
 
     static class ViewHolderVillanos extends RecyclerView.ViewHolder {
 
         // Referencias UI
         ImageView imgVillano;
+        ImageView imgEliminar;
         TextView txtNombreVillano;
         TextView txtPelicula;
         TextView txtPoderes;
@@ -186,6 +214,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         public ViewHolderVillanos(View itemView) {
             super(itemView);
             imgVillano = (ImageView)itemView.findViewById(R.id.imgVillano);
+            imgEliminar = (ImageView)itemView.findViewById(R.id.imgEliminar);
             txtNombreVillano = (TextView)itemView.findViewById(R.id.txtNombreVillano);
             txtPelicula = (TextView)itemView.findViewById(R.id.txtPelicula);
             txtPoderes = (TextView)itemView.findViewById(R.id.txtPoderes);
